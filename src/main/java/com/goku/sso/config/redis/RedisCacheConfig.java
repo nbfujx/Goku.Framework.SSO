@@ -25,13 +25,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 public class RedisCacheConfig  extends CachingConfigurerSupport {
 
-    @Value("${spring.redis.host}")
-    private String host;
-    @Value("${spring.redis.port}")
-    private int port;
-    @Value("${spring.redis.timeout}")
-    private int timeout;
-
     @Bean
     public CacheManager cacheManager(RedisTemplate<Object, Object> redisTemplate) {
         RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);

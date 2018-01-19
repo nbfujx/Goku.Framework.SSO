@@ -8,4 +8,5 @@ import com.goku.sso.model.SsoUser;
  */
 public interface SsoUserExtMapper extends SsoUserMapper {
     SsoUser selectByUsername(String username);
+    SsoUser selectBySsoCode(String sso_code);
 }

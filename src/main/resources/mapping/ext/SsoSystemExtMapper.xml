@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.goku.sso.mapper.ext.SsoUserExtMapper">
-  <resultMap id="SsoUserMap" type="com.goku.sso.model.SsoUser">
+<mapper namespace="com.goku.sso.mapper.ext.SsoSystemExtMapper">
+  <resultMap id="SsoSystemMap" type="com.goku.sso.model.SsoSystem">
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="sso_code" jdbcType="VARCHAR" property="ssoCode" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
@@ -13,19 +13,13 @@
     <result column="last_login_system_id" jdbcType="VARCHAR" property="lastLoginSystemId" />
     <result column="last_login_ip" jdbcType="VARCHAR" property="lastLoginIp" />
     <result column="last_login_date" jdbcType="TIMESTAMP" property="lastLoginDate" />
+    <result column="login_status" jdbcType="CHAR" property="loginStatus" />
+    <result column="login_session" jdbcType="VARCHAR" property="loginSession" />
   </resultMap>
-  <select id="selectByUsername" parameterType="java.lang.String" resultMap="SsoUserMap">
+  <select id="selectByCode" parameterType="java.lang.String" resultMap="SsoSystemMap">
     select
-     id, sso_code, user_name, password, status, email, idcard, mobile, last_login_system_id,
-    last_login_ip, last_login_date, login_status, login_session
-    from sso_user
-    where user_name = #{username,jdbcType=VARCHAR}
-  </select>
-  <select id="selectBySsoCode" parameterType="java.lang.String" resultMap="SsoUserMap">
-    select
-    id, sso_code, user_name, password, status, email, idcard, mobile, last_login_system_id,
-    last_login_ip, last_login_date, login_status, login_session
-    from sso_user
-    where sso_code = #{sso_code,jdbcType=VARCHAR}
+     Id, code, name, url, index_url, login_url, description, if_show
+    from sso_system
+    where code = #{code,jdbcType=VARCHAR}
   </select>
 </mapper>

@@ -1,11 +1,9 @@
 package com.goku.sso.config.shiro;
 
 import com.goku.sso.mapper.ext.SsoUserExtMapper;
-import com.goku.sso.model.SsoUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -21,28 +19,26 @@ public class ShiroRealm extends AuthorizingRealm {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    SsoUserExtMapper ssoUseextmapper;
+    SsoUserExtMapper ssoUserextmapper;
 
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        return info;
-
-    }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         String userName=token.getUsername();
-        SsoUser user = ssoUseextmapper.selectByUsername(token.getUsername());
+        SsoUser user = ssoUserextmapper.selectByUsername(token.getUsername());
         if (user != null) {
-            //设置用户session
             Session session = SecurityUtils.getSubject().getSession();
             session.setAttribute("user", user);
-            return new SimpleAuthenticationInfo(userName,user.getPassword(),getName());
+            return new SimpleAuthenticationInfo(user.getUserName(),user.getPassword(),getName());
         } else {
             return null;
         }
+    }
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        return null;
     }
 }
