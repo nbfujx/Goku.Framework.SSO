@@ -3,4 +3,4 @@
 
 ### 流程图
 
-![流程](http://nbfujx.oss-cn-hangzhou.aliyuncs.com/SSO.bmp)
+![流程]()
