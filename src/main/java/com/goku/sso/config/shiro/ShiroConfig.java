@@ -81,10 +81,11 @@ public class ShiroConfig {
 
         Map<String, String> filterChainDefinitionManager = new LinkedHashMap<String, String>();
         //登录
-        filterChainDefinitionManager.put("/login", "anon");
-        filterChainDefinitionManager.put("/doLogin", "anon");
+        filterChainDefinitionManager.put("/service/login", "anon");
+        filterChainDefinitionManager.put("/service/doLogin", "anon");
+        filterChainDefinitionManager.put("/service/authUser", "anon");
         //登出
-        filterChainDefinitionManager.put("/logout", "anon");
+        filterChainDefinitionManager.put("/service/logout", "anon");
         //静态资源
         filterChainDefinitionManager.put("/js/**","anon");
         filterChainDefinitionManager.put("/css/**","anon");

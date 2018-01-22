@@ -1,6 +1,7 @@
 package com.goku.sso.config.shiro;
 
 import com.goku.sso.mapper.ext.SsoUserExtMapper;
+import com.goku.sso.model.SsoUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -30,8 +31,8 @@ public class ShiroRealm extends AuthorizingRealm {
         SsoUser user = ssoUserextmapper.selectByUsername(token.getUsername());
         if (user != null) {
             Session session = SecurityUtils.getSubject().getSession();
-            session.setAttribute("user", user);
-            return new SimpleAuthenticationInfo(user.getUserName(),user.getPassword(),getName());
+            session.setAttribute(userName, user);
+            return new SimpleAuthenticationInfo(userName,user.getPassword(),getName());
         } else {
             return null;
         }

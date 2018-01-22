@@ -3,23 +3,26 @@
 <mapper namespace="com.goku.sso.mapper.ext.SsoSystemExtMapper">
   <resultMap id="SsoSystemMap" type="com.goku.sso.model.SsoSystem">
     <id column="id" jdbcType="VARCHAR" property="id" />
-    <result column="sso_code" jdbcType="VARCHAR" property="ssoCode" />
-    <result column="user_name" jdbcType="VARCHAR" property="userName" />
-    <result column="password" jdbcType="VARCHAR" property="password" />
-    <result column="status" jdbcType="CHAR" property="status" />
-    <result column="email" jdbcType="VARCHAR" property="email" />
-    <result column="idcard" jdbcType="VARCHAR" property="idcard" />
-    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
-    <result column="last_login_system_id" jdbcType="VARCHAR" property="lastLoginSystemId" />
-    <result column="last_login_ip" jdbcType="VARCHAR" property="lastLoginIp" />
-    <result column="last_login_date" jdbcType="TIMESTAMP" property="lastLoginDate" />
-    <result column="login_status" jdbcType="CHAR" property="loginStatus" />
-    <result column="login_session" jdbcType="VARCHAR" property="loginSession" />
+    <id column="Id" jdbcType="VARCHAR" property="id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="index_url" jdbcType="VARCHAR" property="indexUrl" />
+    <result column="login_url" jdbcType="VARCHAR" property="loginUrl" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="if_show" jdbcType="VARCHAR" property="ifShow" />
   </resultMap>
   <select id="selectByCode" parameterType="java.lang.String" resultMap="SsoSystemMap">
     select
-     Id, code, name, url, index_url, login_url, description, if_show
+     id, code, name, url, index_url, login_url, description, if_show
     from sso_system
     where code = #{code,jdbcType=VARCHAR}
+  </select>
+  <select id="selectBySsoCode" parameterType="java.lang.String" resultMap="SsoSystemMap">
+     select
+    s.id, s.code, s.name, s.url, s.index_url, s.login_url, s.description, s.if_show
+    from sso_system s left join sso_auth a on a.system_id=s.Id
+		left join sso_user u on u.id=a.user_id
+    where u.user_name = #{ssoCode,jdbcType=VARCHAR}
   </select>
 </mapper>

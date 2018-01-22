@@ -22,13 +22,5 @@ import java.util.UUID;
  * @author nbfujx
  * @date 2018-01-16
  */
-
 public interface LoginController {
-    String login(HttpServletRequest request, HttpServletResponse response,
-                 String token,String systemid);
-    String logout(HttpServletRequest request, HttpServletResponse response,
-                 String token,String systemid);
-    String doLogin(HttpServletResponse response,
-            Model model,String systemid, String userName, String password,boolean rememberMe);
-
 }

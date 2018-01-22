@@ -1,9 +1,14 @@
 package com.goku.sso.model.ext;
 
+import java.io.Serializable;
+
 /**
  * Created by nbfujx on 2018/1/19.
  */
-public class SsoToken {
+public class SsoToken implements Serializable {
+
+    private static final long serialVersionUID = -1L;
+
     private String ssoCode;
     private String email;
     private String idcard;

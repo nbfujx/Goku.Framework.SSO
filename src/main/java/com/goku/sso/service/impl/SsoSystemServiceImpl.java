@@ -4,10 +4,14 @@ import com.goku.sso.mapper.ext.SsoSystemExtMapper;
 import com.goku.sso.model.SsoSystem;
 import com.goku.sso.service.SsoSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by nbfujx on 2018/1/19.
  */
+@Service
 public class SsoSystemServiceImpl implements SsoSystemService {
 
     @Autowired
@@ -16,5 +20,10 @@ public class SsoSystemServiceImpl implements SsoSystemService {
     @Override
     public SsoSystem selectByCode(String code) {
         return ssoSystemExtMapper.selectByCode(code);
+    }
+
+    @Override
+    public List<SsoSystem> selectBySsoCode(String SsoCode) {
+        return ssoSystemExtMapper.selectBySsoCode(SsoCode);
     }
 }
