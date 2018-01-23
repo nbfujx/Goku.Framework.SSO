@@ -79,7 +79,8 @@ public class SSOAuthControllerImpl implements SSOAuthController {
     public String login(HttpServletRequest request, HttpServletResponse response,
                         Model model,
                         @CookieValue(value="token",required=false) String token,
-                        @RequestParam(value = "systemid", required = true)  String systemid) {
+                        @RequestParam(value = "systemid", required = true)  String systemid,
+                        @RequestParam(value = "url", required = false,defaultValue = "")  String url) {
         SsoSystem system=ssoSystemService.selectByCode(systemid);
         String returnURL="";
         if(system==null){
@@ -87,16 +88,19 @@ public class SSOAuthControllerImpl implements SSOAuthController {
         }else{
             if("".equals(token)||token==null) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 returnURL =system.getLoginUrl();
             }else
             {
                 SsoToken ssoToken= (SsoToken) redisTemplate.opsForValue().get(token);
                 if(ssoToken!=null) {
-                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + system.getIndexUrl();
+                    url=url==""?system.getIndexUrl():url;
+                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + url;
                 }else{
                     Cookie tokenck = cookieUtil.delCookie(request,"token");
                     response.addCookie(tokenck);
                     model.addAttribute("systemid",systemid);
+                    model.addAttribute("url",url);
                     returnURL =system.getLoginUrl();
                 }
             }
@@ -149,6 +153,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
     public String doLogin(HttpServletRequest request,HttpServletResponse response,
                           Model model,
                           @RequestParam(value="systemid",required=false) String systemid,
+                          @RequestParam(value="url",required=false) String url,
                           @RequestParam(value = "username", required = true) String userName,
                           @RequestParam(value = "password", required = true)  String password,
                           @RequestParam(value = "rememberMe", required = false, defaultValue = "false") boolean rememberMe) {
@@ -177,7 +182,8 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                 //登记新的用户信息，强制下线原有的用户
                 redisTemplate.opsForValue().set(user.getSsoCode(),uuid);
                 redisTemplate.opsForValue().set(uuid,ssoToken);
-                returnURL="redirect:"+system.getUrl()+"/doAuth?token="+ uuid+"&url="+system.getIndexUrl();
+                url=url==""?system.getIndexUrl():url;
+                returnURL="redirect:"+system.getUrl()+"/doAuth?token="+ uuid+"&url="+url;
             } catch (UnknownAccountException e) {
                 model.addAttribute("systemid",systemid);
                 model.addAttribute("error", "账号不存在!");

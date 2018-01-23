@@ -34,7 +34,8 @@ public interface SSOAuthController {
      * **/
     String login(HttpServletRequest request, HttpServletResponse response,
                  Model model,
-                 String token, String systemid);
+                 String token, String systemid,
+                 String url);
     /**
      * 用户登出
      * **/
@@ -45,6 +46,6 @@ public interface SSOAuthController {
      * 用户登录验证
      * **/
     String doLogin(HttpServletRequest request,HttpServletResponse response,
-                   Model model, String systemid, String userName, String password, boolean rememberMe);
+                   Model model,String url,String systemid, String userName, String password, boolean rememberMe);
 
 }

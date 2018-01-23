@@ -9,6 +9,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -38,8 +40,10 @@ public class SSOAuthControlller {
      * 登录
      * */
     @RequestMapping("/login")
-    public String login( @CookieValue(value="token",required=false) String token)
+    public String login(HttpServletRequest request,
+                        @CookieValue(value="token",required=false) String token)
     {
+        String url = WebUtils.getSavedRequest(request).getRequestUrl();
         if(!"".equals(token)&&token!=null)
         {
             SsoToken ssotoken = ssoAuthService.AuthUser(token);
@@ -48,19 +52,19 @@ public class SSOAuthControlller {
                 UsernamePasswordToken shirotoken = new UsernamePasswordToken(ssotoken.getSsoCode(), "ssotoken");
                 try {
                     subject.login(shirotoken);
-                    return "redirect:/index";
+                    return "redirect:"+url;
                 }catch (UnknownAccountException e) {
                 }catch (IncorrectCredentialsException e) {
                 }catch (AuthenticationException e) {
                 }catch (Exception e) {
                 }
             }else{
-                return "redirect:"+ssourl+"login?systemid="+systemid;
+                return "redirect:"+ssourl+"login?systemid="+systemid+"&url="+url;
             }
 
         }else
         {
-            return "redirect:"+ssourl+"login?systemid="+systemid;
+            return "redirect:"+ssourl+"login?systemid="+systemid+"&url="+url;
         }
         return null;
     }
@@ -87,7 +91,8 @@ public class SSOAuthControlller {
      * **/
     @RequestMapping("/doAuth")
     public String doAuth(HttpServletResponse response,
-                         @RequestParam(value = "token", required = true)  String token)
+                         @RequestParam(value = "token", required = true)  String token,
+                         @RequestParam(value = "url", required = true)  String url)
     {
         SsoToken ssotoken = ssoAuthService.AuthUser(token);
         if (ssotoken != null) {
@@ -97,7 +102,7 @@ public class SSOAuthControlller {
                 subject.login(shirotoken);
                 Cookie tokenck = new Cookie("token", token);
                 response.addCookie(tokenck);
-                return "redirect:/index";
+                return "redirect:"+url;
             } catch (UnknownAccountException e) {
             } catch (IncorrectCredentialsException e) {
             } catch (AuthenticationException e) {

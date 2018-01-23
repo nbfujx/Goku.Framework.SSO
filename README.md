@@ -3,7 +3,7 @@
 
 ### 流程图
 
-![流程]()
+![流程](http://nbfujx.oss-cn-hangzhou.aliyuncs.com/sso%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
 
 ###  系统功能
 | **序号** | **功能** | **是否完成**|

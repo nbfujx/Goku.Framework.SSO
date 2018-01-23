@@ -23,10 +23,12 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="Goku.Framework.SSO" />
+        <module name="Goku.Framework.SSO.Server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Goku.Framework.SSO" target="1.7" />
+      <module name="Goku.Framework.SSO.Server" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>
