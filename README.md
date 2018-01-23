@@ -4,7 +4,7 @@
 ### 流程图
 
 
-<img width="600" height="300" src="http://nbfujx.oss-cn-hangzhou.aliyuncs.com/sso%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg"/>
+<img width="700" height="700" src="http://nbfujx.oss-cn-hangzhou.aliyuncs.com/ssoPicture/sso.png"/>
 
 ###  系统功能
 | **序号** | **功能** | **是否完成**|
