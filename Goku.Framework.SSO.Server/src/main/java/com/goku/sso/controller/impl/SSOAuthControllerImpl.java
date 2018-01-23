@@ -84,7 +84,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
         SsoSystem system=ssoSystemService.selectByCode(systemid);
         String returnURL="";
         if(system==null){
-            returnURL="nofound";
+            returnURL="/nofound";
         }else{
             if("".equals(token)||token==null) {
                 model.addAttribute("systemid",systemid);
@@ -94,8 +94,13 @@ public class SSOAuthControllerImpl implements SSOAuthController {
             {
                 SsoToken ssoToken= (SsoToken) redisTemplate.opsForValue().get(token);
                 if(ssoToken!=null) {
-                    url=url==""?system.getIndexUrl():url;
-                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + url;
+                    SsoSystem systemc=ssoSystemService.selectBySsoCode(systemid,ssoToken.getSsoCode());
+                    if(systemc==null){
+                        returnURL="/noAuthc";
+                    }else {
+                        url = url == "" ? system.getIndexUrl() : url;
+                        returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + url;
+                    }
                 }else{
                     Cookie tokenck = cookieUtil.delCookie(request,"token");
                     response.addCookie(tokenck);
@@ -118,7 +123,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
         String returnURL="";
         SsoSystem system=ssoSystemService.selectByCode(systemid);
         if(system==null){
-            returnURL="nofound";
+            returnURL="/nofound";
         }else{
             if("".equals(token)||token==null) {
                 Cookie systemck = cookieUtil.editCookie(request,"systemid",systemid);
@@ -139,9 +144,9 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                     model.addAttribute("systemid",systemid);
                     returnURL = system.getLoginUrl();
                 } catch (SessionException ise) {
-                    returnURL="error";
+                    returnURL="/error";
                 } catch (Exception e) {
-                    returnURL="error";
+                    returnURL="/error";
                 }
             }
         }
@@ -182,22 +187,31 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                 //登记新的用户信息，强制下线原有的用户
                 redisTemplate.opsForValue().set(user.getSsoCode(),uuid);
                 redisTemplate.opsForValue().set(uuid,ssoToken);
-                url=url==""?system.getIndexUrl():url;
-                returnURL="redirect:"+system.getUrl()+"/doAuth?token="+ uuid+"&url="+url;
+                SsoSystem systemc=ssoSystemService.selectBySsoCode(systemid,ssoToken.getSsoCode());
+                if(systemc==null){
+                    returnURL="/noAuthc";
+                }else {
+                    url = url == "" ? system.getIndexUrl() : url;
+                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + uuid + "&url=" + url;
+                }
             } catch (UnknownAccountException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "账号不存在!");
                 returnURL=system.getLoginUrl();
             } catch (IncorrectCredentialsException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "账号密码错误!");
                 returnURL=system.getLoginUrl();
             } catch (AuthenticationException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "登录异常!请联系管理员!");
                 returnURL=system.getLoginUrl();
             } catch (Exception e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "系统异常!");
                 returnURL=system.getLoginUrl();
             }
