@@ -31,7 +31,7 @@ public class ShiroRealm extends AuthorizingRealm {
         SsoUser user = ssoUserextmapper.selectByUsername(token.getUsername());
         if (user != null) {
             Session session = SecurityUtils.getSubject().getSession();
-            session.setAttribute(userName, user);
+            session.setAttribute("user", user);
             return new SimpleAuthenticationInfo(userName,user.getPassword(),getName());
         } else {
             return null;

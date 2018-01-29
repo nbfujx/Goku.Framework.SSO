@@ -23,6 +23,6 @@
     s.id, s.code, s.name, s.url, s.index_url, s.login_url, s.description, s.if_show
     from sso_system s left join sso_auth a on a.system_id=s.Id
 		left join sso_user u on u.id=a.user_id
-    where u.user_name = #{ssoCode,jdbcType=VARCHAR} and s.code = #{code,jdbcType=VARCHAR}
+    where u.sso_code = #{ssoCode,jdbcType=VARCHAR} and s.code = #{code,jdbcType=VARCHAR}
   </select>
 </mapper>

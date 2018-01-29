@@ -45,24 +45,25 @@ public class SSOAuthControllerImpl implements SSOAuthController {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @Autowired
-    RestTemplate restTemplate;
 
     @Override
     @ResponseBody
-    public String RegistryUser(String systemId, SsoUser ssoUser) {
+    public String RegistryUser(@RequestBody String systemId,
+                                @RequestBody SsoUser ssoUser) {
         return null;
     }
 
     @Override
     @ResponseBody
-    public String ModifyUser(String systemId, SsoUser ssoUser) {
+    public String ModifyUser(@RequestBody String systemId,
+                              @RequestBody SsoUser ssoUser) {
         return null;
     }
 
     @Override
     @ResponseBody
-    public String DisableUser(String systemId, String ssoCode) {
+    public String DisableUser(@RequestParam(value = "systemId", required = true)  String systemId,
+                               @RequestParam(value = "ssoCode", required = true) String ssoCode) {
         return null;
     }
 
@@ -84,7 +85,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
         SsoSystem system=ssoSystemService.selectByCode(systemid);
         String returnURL="";
         if(system==null){
-            returnURL="nofound";
+            returnURL="/nofound";
         }else{
             if("".equals(token)||token==null) {
                 model.addAttribute("systemid",systemid);
@@ -94,8 +95,13 @@ public class SSOAuthControllerImpl implements SSOAuthController {
             {
                 SsoToken ssoToken= (SsoToken) redisTemplate.opsForValue().get(token);
                 if(ssoToken!=null) {
-                    url=url==""?system.getIndexUrl():url;
-                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + url;
+                    SsoSystem systemc=ssoSystemService.selectBySsoCode(systemid,ssoToken.getSsoCode());
+                    if(systemc==null){
+                        returnURL="/noAuthc";
+                    }else {
+                        url = url == "" ? system.getIndexUrl() : url;
+                        returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + token + "&url=" + url;
+                    }
                 }else{
                     Cookie tokenck = cookieUtil.delCookie(request,"token");
                     response.addCookie(tokenck);
@@ -118,7 +124,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
         String returnURL="";
         SsoSystem system=ssoSystemService.selectByCode(systemid);
         if(system==null){
-            returnURL="nofound";
+            returnURL="/nofound";
         }else{
             if("".equals(token)||token==null) {
                 Cookie systemck = cookieUtil.editCookie(request,"systemid",systemid);
@@ -139,9 +145,9 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                     model.addAttribute("systemid",systemid);
                     returnURL = system.getLoginUrl();
                 } catch (SessionException ise) {
-                    returnURL="error";
+                    returnURL="/error";
                 } catch (Exception e) {
-                    returnURL="error";
+                    returnURL="/error";
                 }
             }
         }
@@ -171,7 +177,7 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                 String uuid = UUID.randomUUID().toString();
                 Cookie tokenck = cookieUtil.addCookie("token", uuid);
                 response.addCookie(tokenck);
-                SsoUser user = (SsoUser) subject.getSession().getAttribute(subject.getPrincipal());
+                SsoUser user = (SsoUser) subject.getSession().getAttribute("user");
                 SsoToken ssoToken=new SsoToken(user.getSsoCode(),user.getEmail(),user.getIdcard(),user.getMobile());
                 //删除原来存在的用户信息
                 String strtoken= (String) redisTemplate.opsForValue().get(user.getSsoCode());
@@ -182,22 +188,31 @@ public class SSOAuthControllerImpl implements SSOAuthController {
                 //登记新的用户信息，强制下线原有的用户
                 redisTemplate.opsForValue().set(user.getSsoCode(),uuid);
                 redisTemplate.opsForValue().set(uuid,ssoToken);
-                url=url==""?system.getIndexUrl():url;
-                returnURL="redirect:"+system.getUrl()+"/doAuth?token="+ uuid+"&url="+url;
+                SsoSystem systemc=ssoSystemService.selectBySsoCode(systemid,ssoToken.getSsoCode());
+                if(systemc==null){
+                    returnURL="/noAuthc";
+                }else {
+                    url = url == "" ? system.getIndexUrl() : url;
+                    returnURL = "redirect:" + system.getUrl() + "/doAuth?token=" + uuid + "&url=" + url;
+                }
             } catch (UnknownAccountException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "账号不存在!");
                 returnURL=system.getLoginUrl();
             } catch (IncorrectCredentialsException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "账号密码错误!");
                 returnURL=system.getLoginUrl();
             } catch (AuthenticationException e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "登录异常!请联系管理员!");
                 returnURL=system.getLoginUrl();
             } catch (Exception e) {
                 model.addAttribute("systemid",systemid);
+                model.addAttribute("url",url);
                 model.addAttribute("error", "系统异常!");
                 returnURL=system.getLoginUrl();
             }
